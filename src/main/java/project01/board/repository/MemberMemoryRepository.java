@@ -1,32 +1,44 @@
 package project01.board.repository;
 
+import lombok.extern.slf4j.Slf4j;
+import project01.board.Utiliry.IdConstructor;
 import project01.board.member.Member;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+@Slf4j
 public class MemberMemoryRepository implements MemberRepository{
 
-    Map<Long, Member> repository = new HashMap<>();
+    Map<Long, Member> store = new HashMap<>();
+    IdConstructor idConstructor = IdConstructor.getIdConstructor();
 
     @Override
     public void save(Member entity) {
-
+         entity.setId(idConstructor.getMemberId());
+         store.put(entity.getId(), entity);
     }
 
     @Override
     public List<Member> findAll() {
-        return null;
+        return new ArrayList<>(store.values());
     }
 
     @Override
-    public void update(Member entity) {
+    public Optional<Member> findById(Long id){
+        return Optional.ofNullable(store.get(id));
+    }
 
+    @Override
+    public void update(Long id, Member updateEntity) {
+        updateEntity.setId(id);
+        store.replace(updateEntity.getId(), updateEntity);
     }
 
     @Override
     public void delete(Long id) {
-
+        store.remove(id);
+    }
+    public void clearStore(){
+        store.clear();
     }
 }

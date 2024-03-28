@@ -8,7 +8,7 @@ public class IdConstructor {
 
     private IdConstructor(){};
 
-    public IdConstructor getIdConstructor(){
+    public static IdConstructor getIdConstructor(){
         return idConstructor;
     }
 
