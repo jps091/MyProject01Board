@@ -1,5 +1,6 @@
 package project01.board.member;
 
+import org.springframework.stereotype.Component;
 import project01.board.repository.MemberMemoryRepository;
 import project01.board.repository.MemberRepository;
 
@@ -7,9 +8,14 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+@Component
 public class MemberServiceImpl implements MemberService{
 
-    MemberRepository memberRepository = new MemberMemoryRepository();
+    private final MemberRepository memberRepository;
+
+    public MemberServiceImpl(MemberRepository memberRepository) {
+        this.memberRepository = memberRepository;
+    }
 
     @Override
     public void join(Member member) {
@@ -17,8 +23,8 @@ public class MemberServiceImpl implements MemberService{
     }
 
     @Override
-    public Optional<Member> findMember(Long memberId) {
-        return memberRepository.findById(memberId);
+    public Member findMember(Long memberId) {
+        return memberRepository.findById(memberId).orElseThrow(() -> new NoSuchElementException("member ID " + memberId + "는 존재하지 않습니다."));
     }
 
     @Override

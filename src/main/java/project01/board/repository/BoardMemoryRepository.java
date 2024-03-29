@@ -1,10 +1,12 @@
 package project01.board.repository;
 
+import org.springframework.stereotype.Component;
 import project01.board.Utiliry.IdConstructor;
 import project01.board.board.Board;
 
 import java.util.*;
 
+@Component
 public class BoardMemoryRepository implements BoardRepository{
 
     Map<Long, Board> store = new HashMap<>();

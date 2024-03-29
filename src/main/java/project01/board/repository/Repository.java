@@ -7,7 +7,7 @@ public interface Repository<T> {
 
     void save(T entity);
     List<T> findAll();
-    <T> Optional<T> findById(Long id);
+    Optional<T> findById(Long id);
     void update(Long id, T updateEntity);
     void delete(Long id);
 }

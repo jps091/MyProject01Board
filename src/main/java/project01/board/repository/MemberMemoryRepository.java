@@ -1,11 +1,13 @@
 package project01.board.repository;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import project01.board.Utiliry.IdConstructor;
 import project01.board.member.Member;
 
 import java.util.*;
 
+@Component
 @Slf4j
 public class MemberMemoryRepository implements MemberRepository{
 
