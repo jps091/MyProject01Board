@@ -1,5 +1,6 @@
 package project01.board.member;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import project01.board.repository.MemberMemoryRepository;
 import project01.board.repository.MemberRepository;
@@ -25,6 +26,18 @@ public class MemberServiceImpl implements MemberService{
     @Override
     public Member findMember(Long memberId) {
         return memberRepository.findById(memberId).orElseThrow(() -> new NoSuchElementException("member ID " + memberId + "는 존재하지 않습니다."));
+    } // orElse 사용법
+
+    @Override
+    public Member findByName(String name){
+        List<Member> members = findAllMember();
+
+        for (Member find : members) {
+            if(find.getName().equals(name)) {
+                return find;
+            }
+        }
+        throw new MemberNotFoundException(name + " 멤버가 존재 하지 않습니다.");
     }
 
     @Override
@@ -33,11 +46,12 @@ public class MemberServiceImpl implements MemberService{
     }
 
     @Override
-    public void Update(Long id, Member updateMember) {
+    public Member Update(Long id, Member updateMember) {
         if(memberRepository.findById(id).isEmpty()){
-            throw new NoSuchElementException("수정할 멤버가 존재 하지 않습니다.");
+            throw new MemberNotFoundException("수정할 멤버가 존재 하지 않습니다.");
         }
         memberRepository.update(id, updateMember);
+        return memberRepository.findById(id).get();
     }
 
     @Override
@@ -45,9 +59,7 @@ public class MemberServiceImpl implements MemberService{
         if(memberRepository.findById(id).isPresent()){
             memberRepository.delete(id);
             return true;
-        }else{
-            System.out.println("삭제할 멤버가 존재 하지 않습니다.");
-            return false;
         }
+        throw new MemberNotFoundException("삭제할 멤버가 존재하지 않습니다.");
     }
 }

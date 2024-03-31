@@ -1,10 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
 <body>
-$END$
+<div class="container">
+    <form action="/member/update" method="post">
+        <div class="form-group">
+            <label for="name">이름</label>
+            <input type="text" id="name" name="name" placeholder="나이를 변경할 이름을 입력하세요">
+            <label for="age">나이</label>
+            <input type="text" id="age" name="age" placeholder="변경할 나이를 입력하세요">
+        </div>
+        <button type="submit">변경</button>
+    </form>
+    <p th:if="${message != null}">
+        <span th:text="${message}"></span>
+    </p>
+</div> <!-- /container -->
 </body>
 </html>

@@ -7,7 +7,8 @@ public interface MemberService {
 
     void join(Member member);
     Member findMember(Long memberId);
+    Member findByName(String name);
     List<Member> findAllMember();
-    void Update(Long id, Member updateMember);
+    Member Update(Long id, Member updateMember);
     boolean Delete(Long id);
 }

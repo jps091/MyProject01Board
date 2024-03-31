@@ -33,7 +33,7 @@ class BoardServiceImplTest {
         memberRepository.save(member);
 
         //when 실행
-        boolean empty = memberRepository.findById(member.getId()).isEmpty();
+        boolean empty = memberRepository.findById(member.getMemberId()).isEmpty();
 
         //then 검증
         assertThat(empty).isEqualTo(false);

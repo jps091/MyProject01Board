@@ -16,8 +16,8 @@ public class MemberMemoryRepository implements MemberRepository{
 
     @Override
     public void save(Member entity) {
-         entity.setId(idConstructor.getMemberId());
-         store.put(entity.getId(), entity);
+         entity.setMemberId(idConstructor.getMemberId());
+         store.put(entity.getMemberId(), entity);
     }
 
     @Override
@@ -32,8 +32,7 @@ public class MemberMemoryRepository implements MemberRepository{
 
     @Override
     public void update(Long id, Member updateEntity) {
-        updateEntity.setId(id);
-        store.replace(updateEntity.getId(), updateEntity);
+        store.put(id, updateEntity);
     }
 
     @Override

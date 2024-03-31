@@ -68,10 +68,10 @@ class MemberMemoryRepositoryTest {
         Member member2 = new Member();
         member2.setName("new");
         member2.setAge(20);
-        repository.update(member1.getId(), member2);
+        repository.update(member1.getMemberId(), member2);
 
         //then 검증
-        Optional<Member> id = repository.findById(member2.getId());
+        Optional<Member> id = repository.findById(member2.getMemberId());
         Member findMember = id.get();
         assertThat(findMember.getAge()).isSameAs(member2.getAge());
     }
@@ -85,10 +85,10 @@ class MemberMemoryRepositoryTest {
         repository.save(member);
 
         //when 찾기실행
-        repository.delete(member.getId());
+        repository.delete(member.getMemberId());
 
         //then 검증
-        Optional<Member> findMemberOptional = repository.findById(member.getId());
+        Optional<Member> findMemberOptional = repository.findById(member.getMemberId());
         assertThrows(NoSuchElementException.class, () -> {
             findMemberOptional.get();
         });
