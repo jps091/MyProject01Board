@@ -49,9 +49,9 @@ public class MemberController {
     }
 
     @GetMapping("/findName")
-    public String findMember(Model model, @RequestParam String name) {
+    public String findMember(Model model, @ModelAttribute MemberForm member) {
         try {
-            Member findMember = memberService.findByName(name);
+            Member findMember = memberService.findByName(member.getName());
             model.addAttribute("member", findMember);
             return "member/saveMember";
         } catch (MemberNotFoundException e) {
@@ -65,7 +65,7 @@ public class MemberController {
     }
 
     @PostMapping("/update")
-    public String updateMember(Model model, @RequestParam String name, @RequestParam int age) {
+    public String updateMember(Model model, @RequestParam("name") String name, @RequestParam(required = false, defaultValue = "100") int age) {
         Member existMember = memberService.findByName(name);
         Member updateMember = new Member();
         updateMember.setMemberId(existMember.getMemberId());
