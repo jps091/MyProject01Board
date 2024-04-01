@@ -101,6 +101,7 @@ public class BoardController {
                 break;
             }
         }
+
         model.addAttribute("deleteBoard", deleteBoard);
         return "/boards/deletedBoard";
     }
