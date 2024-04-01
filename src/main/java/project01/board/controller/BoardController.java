@@ -4,8 +4,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import project01.board.board.Board;
+import project01.board.board.BoardNotFoundException;
 import project01.board.board.BoardService;
-import project01.board.member.Member;
+import project01.board.member.MemberNotFoundException;
 import project01.board.repository.MemberRepository;
 
 import java.util.ArrayList;
@@ -29,10 +30,15 @@ public class BoardController {
     }
     @PostMapping
     public String createBoard(Model model, @ModelAttribute BoardForm boardForm){
-        Long memberId = memberRepository.findByNameId(boardForm.getMemberName());
-        boardService.CreateBoard(memberId, boardForm.getTitle(), boardForm.getContent());
-        model.addAttribute("cratedBoard", boardForm);
-        return "/boards/createdBoard";
+        try{
+            Long memberId = memberRepository.findByNameId(boardForm.getMemberName());
+            boardService.CreateBoard(memberId, boardForm.getTitle(), boardForm.getContent());
+            model.addAttribute("cratedBoard", boardForm);
+            return "/boards/createdBoard";
+        }catch (MemberNotFoundException e){
+            model.addAttribute("message", "존재하지 않는 회원 입니다.");
+            return "/boards/createBoardForm";
+        }
     }
     @GetMapping
     public String findAllBoards(Model model){
@@ -48,7 +54,23 @@ public class BoardController {
 
     @GetMapping("/memberIdBoard")
     public String findBoard(Model model, @RequestParam("memberName") String memberName){
-        Long memberId = memberRepository.findByNameId(memberName);
+        try {
+            Long memberId = memberRepository.findByNameId(memberName);
+            try{
+                List<Board> findBoards = findBoards(memberId);
+                model.addAttribute("findBoards", findBoards);
+                return "/boards/finedBoard";
+            }catch (BoardNotFoundException e){
+                model.addAttribute("message", "회원님이 작성하신 게시글이 없습니다.");
+                return "/boards/findBoardForm";
+            }
+        }catch (MemberNotFoundException e) {
+            model.addAttribute("message", "존재하지 않는 회원 입니다.");
+            return "/boards/findBoardForm";
+        }
+    }
+
+    private List<Board> findBoards(Long memberId) {
         List<Board> boards = boardService.findAll();
         List<Board> findBoards = new ArrayList<>();
         for (Board board : boards) {
@@ -56,8 +78,10 @@ public class BoardController {
                 findBoards.add(board);
             }
         }
-        model.addAttribute("findBoards", findBoards);
-        return "/boards/finedBoard";
+        if(findBoards.isEmpty()){
+            throw new BoardNotFoundException(memberId + " : 작성한 게시글 없음");
+        }
+        return findBoards;
     }
 
     @GetMapping("/updateForm")
@@ -67,21 +91,42 @@ public class BoardController {
 
     @PostMapping("/updateBoard")
     public String updateBoard(Model model, @ModelAttribute BoardForm boardForm){
-        Long memberId = memberRepository.findByNameId(boardForm.getMemberName());
-        Board updateBoard = new Board();
-        updateBoard.setMemberId(memberId);
-        updateBoard.setTitle(boardForm.getTitle());
-        updateBoard.setContent(boardForm.getContent());
+        try{
+            Long memberId = memberRepository.findByNameId(boardForm.getMemberName());
+            try{
+                Board updateBoard = createUpdateBoard(boardForm, memberId);
+                Board existBoard = findExistBoard(boardForm, memberId);
+                boardService.Update(existBoard.getBoardId(), updateBoard);
+                model.addAttribute("updateBoard", updateBoard);
+                return "/boards/updatedBoard";
+            }catch (BoardNotFoundException e) {
+                model.addAttribute("message", "작성자와 게시글 제목이 일치하는 게시글이 없습니다.");
+                return "/boards/updateBoardForm";
+            }
+        }catch (MemberNotFoundException e){
+            model.addAttribute("message", "존재하지 않는 회원 입니다.");
+            return "/boards/updateBoardForm";
+        }
+    }
+
+    private Board findExistBoard(BoardForm boardForm, Long memberId) {
         List<Board> boards = boardService.findAll();
         for (Board board : boards) {
             if(board.getMemberId().equals(memberId) && board.getTitle().equals(boardForm.getTitle())){
                 //updateBoard = board;
-                boardService.Update(board.getBoardId(), updateBoard);
-                break;
+                //boardService.Update(board.getBoardId(), updateBoard);
+                return board;
             }
         }
-        model.addAttribute("updateBoard", updateBoard);
-        return "/boards/updatedBoard";
+        throw new BoardNotFoundException(boardForm.getMemberName() + " 이 작성한 " + boardForm.getTitle() + "의 글은 없습니다.");
+    }
+
+    private Board createUpdateBoard(BoardForm boardForm, Long memberId) {
+        Board createBoard = new Board();
+        createBoard.setMemberId(memberId);
+        createBoard.setTitle(boardForm.getTitle());
+        createBoard.setContent(boardForm.getContent());
+        return createBoard;
     }
 
     @GetMapping("/deleteForm")
@@ -91,18 +136,30 @@ public class BoardController {
 
     @PostMapping("/deleteBoard")
     public String deleteBoard(Model model, @RequestParam("memberName") String memberName){
-        Long memberId = memberRepository.findByNameId(memberName);
+        try {
+            Long memberId = memberRepository.findByNameId(memberName);
+            try {
+                Board deleteBoard = findBoardDelete(memberId);
+                boardService.Delete(deleteBoard.getBoardId());
+                model.addAttribute("deleteBoard", deleteBoard);
+                return "/boards/deletedBoard";
+            } catch (BoardNotFoundException e) {
+                model.addAttribute("message", "삭제할 게시글이 없습니다.");
+                return "/boards/deleteBoardForm";
+            }
+        }catch (MemberNotFoundException e){
+            model.addAttribute("message", "존재하지 않는 회원 입니다.");
+            return "/boards/deleteBoardForm";
+        }
+    }
+
+    private Board findBoardDelete(Long memberId) {
         List<Board> boards = boardService.findAll();
-        Board deleteBoard = new Board();
         for (Board board : boards) {
             if(board.getMemberId().equals(memberId)){
-                boardService.Delete(board.getBoardId());
-                deleteBoard = board;
-                break;
+                return board;
             }
         }
-
-        model.addAttribute("deleteBoard", deleteBoard);
-        return "/boards/deletedBoard";
+        throw new BoardNotFoundException(memberId + " : 작성한 게시글이 없습니다.");
     }
 }

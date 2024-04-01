@@ -13,6 +13,9 @@
         </div>
         <button type="submit">작성</button>
     </form>
+    <p th:if="${message != null}">
+        <span th:text="${message}"></span>
+    </p>
 </div> <!-- /container -->
 </body>
 </html>

@@ -3,7 +3,9 @@ package project01.board.repository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import project01.board.Utiliry.IdConstructor;
+import project01.board.board.BoardNotFoundException;
 import project01.board.member.Member;
+import project01.board.member.MemberNotFoundException;
 
 import java.util.*;
 
@@ -38,7 +40,7 @@ public class MemberMemoryRepository implements MemberRepository{
                 return key;
             }
         }
-        throw new NoSuchElementException("해당 멤버 이름이 존재 하지 않습니다.");
+        throw new MemberNotFoundException(name + " 회원을 찾을수 없습니다.");
     }
 
     @Override

@@ -22,7 +22,7 @@ public class BoardServiceImpl implements  BoardService{
 
     public void CreateBoard(Long memberId, String title, String contents) {
         if(memberRepository.findById(memberId).isEmpty()){
-            throw new NoSuchElementException("멤버가 존재 하지 않습니다");
+            throw new BoardNotFoundException("멤버가 존재 하지 않습니다");
         }
 
         Board board = new Board();
@@ -45,13 +45,13 @@ public class BoardServiceImpl implements  BoardService{
         }else{
             throw new NoSuchElementException("게시판이 존재하지 않습니다.");
         }*/
-        return boardRepository.findById(boardId).orElseThrow(() -> new NoSuchElementException("게시판 ID " + boardId + "는 존재하지 않습니다."));
+        return boardRepository.findById(boardId).orElseThrow(() -> new BoardNotFoundException("게시판 ID " + boardId + "는 존재하지 않습니다."));
     }
 
     @Override
     public void Update(Long boardId, Board updateBoard) {
         if(boardRepository.findById(boardId).isEmpty()){
-            throw new NoSuchElementException("변경할 게시판이 존재 하지 않습니다.");
+            throw new BoardNotFoundException("변경할 게시판이 존재 하지 않습니다.");
         }
         boardRepository.update(boardId, updateBoard);
     }
@@ -62,8 +62,7 @@ public class BoardServiceImpl implements  BoardService{
             boardRepository.delete(boardId);
             return true;
         }else{
-            System.out.println("삭제할 게시판이 존재 하지 않습니다.");
-            return false;
+            throw new BoardNotFoundException("삭제할 게시판이 존재 하지 않습니다.");
         }
     }
 }
