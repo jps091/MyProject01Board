@@ -31,6 +31,17 @@ public class MemberMemoryRepository implements MemberRepository{
     }
 
     @Override
+    public Long findByNameId(String name){
+        Set<Long> keys = store.keySet();
+        for (Long key : keys) {
+            if(store.get(key).getName().equals(name)){
+                return key;
+            }
+        }
+        throw new NoSuchElementException("해당 멤버 이름이 존재 하지 않습니다.");
+    }
+
+    @Override
     public void update(Long id, Member updateEntity) {
         store.put(id, updateEntity);
     }

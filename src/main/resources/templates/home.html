@@ -2,17 +2,25 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
 <div class="container">
-    <div>
-        <h1>Hello Spring</h1>
-        <p>회원 기능</p>
-        <p>
-            <a href="/member">회원 가입</a>
-            <a href="/member/members">회원 전체 목록</a>
-            <a href="/member/name">회원 이름 조회</a>
-            <a href="/member/update">회원 나이 변경</a>
-            <a href="/member/remove">회원 삭제</a>
-        </p>
-    </div>
-</div> <!-- /container -->
+    <h1>Hello Spring</h1>
+    <section class="member-functions">
+        <h2>회원 기능</h2>
+        <ul>
+            <li><a href="/member">회원 가입</a></li>
+            <li><a href="/member/members">회원 전체 목록</a></li>
+            <li><a href="/member/name">회원 이름 조회</a></li>
+            <li><a href="/member/update">회원 나이 변경</a></li>
+            <li><a href="/member/remove">회원 삭제</a></li>
+        </ul>
+        <h2>게시판 기능</h2>
+        <ul>
+            <li><a href="/boards/createForm">게시판 작성</a></li>
+            <li><a href="/boards">게시판 전체 목록</a></li>
+            <li><a href="/boards/findForm">게시판 조회</a></li>
+            <li><a href="/boards/updateForm">게시판 내용 변경</a></li>
+            <li><a href="/boards/deleteForm">게시판 삭제</a></li>
+        </ul>
+    </section>
+</div>
 </body>
 </html>

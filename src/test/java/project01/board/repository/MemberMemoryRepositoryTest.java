@@ -94,4 +94,16 @@ class MemberMemoryRepositoryTest {
         });
         //assertFalse(findMemberOptional.isPresent());
     }
+
+    @Test
+    void 이름으로_키_찾기(){
+        Member member = new Member();
+        member.setName("test");
+        member.setAge(30);
+        repository.save(member);
+
+        Long findKey = repository.findByNameId("test");
+
+        assertThat(findKey).isEqualTo(member.getMemberId());
+    }
 }

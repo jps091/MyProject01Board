@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>찾은 게시판 정보</title>
+</head>
+<body>
+<h1>찾은 게시판 정보</h1>
+<ul th:each="board : ${findBoards}">
+    <li th:text="${board.title}"></li>
+    <li th:text="${board.content}"></li>
+</ul>
+</body>
+</html>
