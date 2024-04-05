@@ -48,15 +48,17 @@ class MemberServiceImplTest {
         member2.setName("find");
         member1.setAge(20);
         member2.setAge(30);
+    }
+
+    @Test
+    void 삭제(){
+        Member member1 = new Member();
+        member1.setName("spring");
+        member1.setAge(20);
         memberRepository.save(member1);
-       //memberRepository.save(member2);
-        member2.setMemberId(member1.getMemberId());
 
-        memberService.Update(member1.getMemberId(), member2);
-        List<Member> list = memberRepository.findAll();
-        int len = list.size();
-        Member update = memberRepository.findById(member1.getMemberId()).get();
+        memberService.Delete(member1.getMemberId());
 
-        assertThat(update.getAge()).isSameAs(30);
+        assertThat(memberRepository.findAll().size()).isEqualTo(0);
     }
 }

@@ -1,5 +1,6 @@
 package project01.board.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -13,12 +14,20 @@ import java.util.List;
 
 @RequestMapping("/members")
 @Controller
+@Slf4j
 public class MemberController {
 
     private final MemberService memberService;
 
     public MemberController(MemberService memberService) {
         this.memberService = memberService;
+    }
+
+    @GetMapping("/member/{memberId}")
+    public String showMember(@PathVariable Long memberId, Model model){
+        Member member = memberService.findMember(memberId);
+        model.addAttribute("member", member);
+        return "members/member";
     }
 
     @GetMapping("/join")
@@ -32,7 +41,8 @@ public class MemberController {
         member.setName(form.getName());
         member.setAge(form.getAge());
         memberService.join(member);
-        return "redirect:/members/find/name?name="+member.getName();
+        //return "redirect:/members/find/name?name="+member.getName();
+        return "redirect:/members/member/"+member.getMemberId();
     }
 
     @GetMapping
@@ -73,13 +83,15 @@ public class MemberController {
 
     @PostMapping("/update/{name}") //@RequestParam(required = false, defaultValue = "100") int age
     public String updateAgeForm(@PathVariable String name,
-                                @ModelAttribute Member updateMember,
+                                @RequestParam int age,
                                 RedirectAttributes redirectAttributes) {
-        Member existMember = memberService.findByName(name);
-        existMember = memberService.Update(existMember.getMemberId(), updateMember);
-        redirectAttributes.addAttribute("name", name);
+        Member updateMember = memberService.findByName(name);
+        updateMember.setAge(age);
+        Long updateId = memberService.Update(updateMember.getMemberId(), updateMember).getMemberId();
+        redirectAttributes.addAttribute("updateId", updateId);
         redirectAttributes.addAttribute("status", true);
-        return "redirect:/members/find/name?name={name}";
+        log.info("existMember.getMemberId()={}",updateId);
+        return "redirect:/members/member/{updateId}";
     }
 
     @GetMapping("/delete/member")
@@ -91,19 +103,12 @@ public class MemberController {
     public String deleteMember(Model model, @RequestParam String name) {
         try {
             Member deleteMember = memberService.findByName(name);
-            boolean result = memberService.Delete(deleteMember.getMemberId());
+            memberService.Delete(deleteMember.getMemberId());
             model.addAttribute("member", deleteMember);
-            return "members/member";
+            return "redirect:/";
         } catch (MemberNotFoundException e) {
             model.addAttribute("message", "삭제할 회원을 찾을 수 없습니다.");
             return "members/deleteForm";
         }
-        //return "member/saveMember";
-/*        if(result)
-            return "member/saveMember";
-        else{
-            model.addAttribute("message", "일치하는 회원을 찾을 수 없습니다.");
-            return "member/removeMember";
-        }*/
     }
 }

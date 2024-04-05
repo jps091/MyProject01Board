@@ -55,10 +55,10 @@ public class MemberServiceImpl implements MemberService{
     }
 
     @Override
-    public boolean Delete(Long id) {
+    public void Delete(Long id) {
         if(memberRepository.findById(id).isPresent()){
             memberRepository.delete(id);
-            return true;
+            return;
         }
         throw new MemberNotFoundException("삭제할 멤버가 존재하지 않습니다.");
     }
