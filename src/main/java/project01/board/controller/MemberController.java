@@ -3,6 +3,7 @@ package project01.board.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import project01.board.member.Member;
 import project01.board.member.MemberNotFoundException;
 import project01.board.member.MemberService;
@@ -10,7 +11,7 @@ import project01.board.member.MemberService;
 import java.util.List;
 
 
-@RequestMapping("/member")
+@RequestMapping("/members")
 @Controller
 public class MemberController {
 
@@ -20,77 +21,82 @@ public class MemberController {
         this.memberService = memberService;
     }
 
-    @GetMapping
-    public String moveCreateMember() {
-        return "member/createMemberForm";
+    @GetMapping("/join")
+    public String joinForm() {
+        return "/members/joinForm";
     }
 
-    @PostMapping
-    public String createMember(MemberForm form, Model model) {
+    @PostMapping("/join")
+    public String joinMember(@ModelAttribute Member form) {
         Member member = new Member();
         member.setName(form.getName());
         member.setAge(form.getAge());
-
         memberService.join(member);
-        model.addAttribute("member", member);
-        return "member/saveMember";
+        return "redirect:/members/find/name?name="+member.getName();
     }
 
-    @GetMapping("/members")
+    @GetMapping
     public String membersList(Model model) {
         List<Member> members = memberService.findAllMember();
         model.addAttribute("members", members);
-        return "member/membersList";
+        return "members/members";
     }
 
-    @GetMapping("/name")
-    public String moveFindMember() {
-        return "member/findMember";
+    @GetMapping("/find")
+    public String findForm() {
+        return "members/findForm";
     }
 
-    @GetMapping("/findName")
-    public String findMember(Model model, @ModelAttribute MemberForm member) {
+    @GetMapping("/find/name") //"@{/members/find/{name}(name=${member.name})}"
+    public String findMember(Model model, @RequestParam String name) {
         try {
-            Member findMember = memberService.findByName(member.getName());
+            Member findMember = memberService.findByName(name);
             model.addAttribute("member", findMember);
-            return "member/saveMember";
+            return "members/member";
         } catch (MemberNotFoundException e) {
             model.addAttribute("message", "일치하는 회원을 찾을 수 없습니다.");
-            return "member/findMember";
+            return "members/findForm";
         }
     }
     @GetMapping("/update")
-    public String moveUpdateMember() {
-        return "member/updateMember";
+    public String nameForm(){
+        return "members/nameForm";
     }
 
-    @PostMapping("/update")
-    public String updateMember(Model model, @RequestParam("name") String name, @RequestParam(required = false, defaultValue = "100") int age) {
+    @GetMapping("/update/name") //@RequestParam(required = false, defaultValue = "100") int age
+    public String nameForm2(@RequestParam("name") String name, Model model) {
+        Member findMember = memberService.findByName(name);
+        model.addAttribute("member",findMember);
+        return "members/ageForm";
+    }
+
+
+    @PostMapping("/update/{name}") //@RequestParam(required = false, defaultValue = "100") int age
+    public String updateAgeForm(@PathVariable String name,
+                                @ModelAttribute Member updateMember,
+                                RedirectAttributes redirectAttributes) {
         Member existMember = memberService.findByName(name);
-        Member updateMember = new Member();
-        updateMember.setMemberId(existMember.getMemberId());
-        updateMember.setName(name);
-        updateMember.setAge(age);
-        updateMember = memberService.Update(existMember.getMemberId(), updateMember);
-        model.addAttribute("member",updateMember);
-        return "member/saveMember";
+        existMember = memberService.Update(existMember.getMemberId(), updateMember);
+        redirectAttributes.addAttribute("name", name);
+        redirectAttributes.addAttribute("status", true);
+        return "redirect:/members/find/name?name={name}";
     }
 
-    @GetMapping("/remove")
-    public String moveRemoveMember() {
-        return "member/removeMember";
+    @GetMapping("/delete/member")
+    public String deleteForm() {
+        return "members/deleteForm";
     }
 
-    @PostMapping("/removeName")
+    @PostMapping("/delete/member")
     public String deleteMember(Model model, @RequestParam String name) {
         try {
             Member deleteMember = memberService.findByName(name);
             boolean result = memberService.Delete(deleteMember.getMemberId());
             model.addAttribute("member", deleteMember);
-            return "member/saveMember";
+            return "members/member";
         } catch (MemberNotFoundException e) {
             model.addAttribute("message", "삭제할 회원을 찾을 수 없습니다.");
-            return "member/removeMember";
+            return "members/deleteForm";
         }
         //return "member/saveMember";
 /*        if(result)

@@ -2,10 +2,11 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
 <div class="container">
-    <form action="/member/update" method="post">
+    <form th:action="@{/members/update/{name}(name=${member.name})}" method="post">
         <div class="form-group">
-            <label for="name">이름</label>
-            <input type="text" id="name" name="name" placeholder="나이를 변경할 이름을 입력하세요">
+            <tr>
+                <td th:text="${member.name}"></td>
+            </tr>
             <label for="age">나이</label>
             <input type="text" id="age" name="age" placeholder="변경할 나이를 입력하세요">
         </div>

@@ -6,6 +6,7 @@
 </head>
 <body>
 <h1>멤버 정보</h1>
+<h2 th:if="${param.status}" th:text="'POST 완료!'"></h2>
 <p th:text="${member.name}"></p>
 <p th:text="${member.age}"></p>
 </body>

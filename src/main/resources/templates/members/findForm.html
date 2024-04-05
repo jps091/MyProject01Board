@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
 <div class="container">
-    <form action="/member/findName" method="get">
+    <form action=/members/find/name method="get">
         <div class="form-group">
             <label for="name">이름</label>
             <input type="text" id="name" name="name" placeholder="찾을 이름을 입력하세요">
@@ -12,6 +12,6 @@
     <p th:if="${message != null}">
         <span th:text="${message}"></span>
     </p>
-</div> <!-- /container -->
+</div>
 </body>
 </html>
