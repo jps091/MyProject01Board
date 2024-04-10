@@ -3,6 +3,7 @@ package project01.board.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import project01.board.board.Board;
 import project01.board.board.BoardNotFoundException;
 import project01.board.board.BoardService;
@@ -24,49 +25,57 @@ public class BoardController {
         this.memberRepository = memberRepository;
     }
 
-    @GetMapping("/createForm")
-    public String createBoardForm(){
-        return "/boards/createBoardForm";
+    @GetMapping("/board/{boardId}")
+    public String resultBoard(@PathVariable Long boardId, Model model){
+        Board resultBoard = boardService.findById(boardId);
+        model.addAttribute("resultBoard", resultBoard);
+        return "/boards/board";
     }
-    @PostMapping
-    public String createBoard(Model model, @ModelAttribute BoardForm boardForm){
+
+    @GetMapping("/create")
+    public String createBoardForm(){
+        return "/boards/createForm";
+    }
+    @PostMapping("/create")
+    public String createBoard(Model model, @ModelAttribute BoardForm boardForm, RedirectAttributes redirectAttributes){
         try{
             Long memberId = memberRepository.findByNameId(boardForm.getMemberName());
-            boardService.CreateBoard(memberId, boardForm.getTitle(), boardForm.getContent());
-            model.addAttribute("cratedBoard", boardForm);
-            return "/boards/createdBoard";
+            Long boardId = boardService.CreateBoard(memberId, boardForm.getTitle(), boardForm.getContent()).getBoardId();
+            redirectAttributes.addAttribute("boardId", boardId);
+            //model.addAttribute("board", boardForm);
+            return "redirect:/boards/board/{boardId}";
         }catch (MemberNotFoundException e){
             model.addAttribute("message", "존재하지 않는 회원 입니다.");
-            return "/boards/createBoardForm";
+            return "/boards/createForm";
         }
     }
     @GetMapping
     public String findAllBoards(Model model){
         List<Board> boards = boardService.findAll();
         model.addAttribute("boards", boards);
-        return "/boards/boardList";
+        return "/boards/boards";
     }
 
-    @GetMapping("/findForm")
+    @GetMapping("/find")
     public String findBoardForm(){
-        return "/boards/findBoardForm";
+        return "/boards/findForm";
     }
 
-    @GetMapping("/memberIdBoard")
+    @GetMapping("/find/boards")
     public String findBoard(Model model, @RequestParam("memberName") String memberName){
         try {
             Long memberId = memberRepository.findByNameId(memberName);
             try{
                 List<Board> findBoards = findBoards(memberId);
-                model.addAttribute("findBoards", findBoards);
-                return "/boards/finedBoard";
+                model.addAttribute("boards", findBoards);
+                return "/boards/boards";
             }catch (BoardNotFoundException e){
                 model.addAttribute("message", "회원님이 작성하신 게시글이 없습니다.");
-                return "/boards/findBoardForm";
+                return "/boards/findForm";
             }
         }catch (MemberNotFoundException e) {
             model.addAttribute("message", "존재하지 않는 회원 입니다.");
-            return "/boards/findBoardForm";
+            return "/boards/findForm";
         }
     }
 
@@ -84,13 +93,13 @@ public class BoardController {
         return findBoards;
     }
 
-    @GetMapping("/updateForm")
+    @GetMapping("/update")
     public String updateBoardForm(){
-        return "/boards/updateBoardForm";
+        return "/boards/updateForm";
     }
 
-    @PostMapping("/updateBoard")
-    public String updateBoard(Model model, @ModelAttribute BoardForm boardForm){
+    @PostMapping("/update")
+    public String updateBoard(Model model, @ModelAttribute BoardForm boardForm, RedirectAttributes redirectAttributes){
         try{
             Long memberId = memberRepository.findByNameId(boardForm.getMemberName());
             try{
@@ -98,14 +107,15 @@ public class BoardController {
                 Board existBoard = findExistBoard(boardForm, memberId);
                 boardService.Update(existBoard.getBoardId(), updateBoard);
                 model.addAttribute("updateBoard", updateBoard);
-                return "/boards/updatedBoard";
+                redirectAttributes.addAttribute("boardId", existBoard.getBoardId());
+                return "redirect:/boards/board/{boardId}";
             }catch (BoardNotFoundException e) {
                 model.addAttribute("message", "작성자와 게시글 제목이 일치하는 게시글이 없습니다.");
-                return "/boards/updateBoardForm";
+                return "/boards/updateForm";
             }
         }catch (MemberNotFoundException e){
             model.addAttribute("message", "존재하지 않는 회원 입니다.");
-            return "/boards/updateBoardForm";
+            return "/boards/updateForm";
         }
     }
 
@@ -142,7 +152,7 @@ public class BoardController {
                 Board deleteBoard = findBoardDelete(memberId);
                 boardService.Delete(deleteBoard.getBoardId());
                 model.addAttribute("deleteBoard", deleteBoard);
-                return "/boards/deletedBoard";
+                return "redirect:/";
             } catch (BoardNotFoundException e) {
                 model.addAttribute("message", "삭제할 게시글이 없습니다.");
                 return "/boards/deleteBoardForm";

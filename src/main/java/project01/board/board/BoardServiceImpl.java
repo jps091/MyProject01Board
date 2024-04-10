@@ -20,7 +20,7 @@ public class BoardServiceImpl implements  BoardService{
 
     @Override
 
-    public void CreateBoard(Long memberId, String title, String contents) {
+    public Board CreateBoard(Long memberId, String title, String contents) {
         if(memberRepository.findById(memberId).isEmpty()){
             throw new BoardNotFoundException("멤버가 존재 하지 않습니다");
         }
@@ -31,6 +31,7 @@ public class BoardServiceImpl implements  BoardService{
         board.setContent(contents);
 
         boardRepository.save(board);
+        return  board;
     }
 
     @Override
