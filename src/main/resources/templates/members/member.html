@@ -9,5 +9,32 @@
 <h2 th:if="${param.status}" th:text="'POST 완료!'"></h2>
 <p th:text="${member.name}"></p>
 <p th:text="${member.age}"></p>
+
+<!-- single checkbox -->
+<div>정회원 승인</div>
+<div>
+    <div class="form-check">
+        <input type="checkbox" id="open" name="open" th:field="${member.open}" class="form-check-input" disabled>
+        <label for="open" class="form-check-label">승인</label>
+    </div>
+</div>
+
+<!-- radio button -->
+<div>
+    <div>성별</div>
+    <div th:each="type : ${genderTypes}" class="form-check form-check-inline">
+        <input type="radio" th:field="${member.genderType}" th:value="${type.name()}"
+               class="form-check-input" disabled>
+        <label th:for="${#ids.prev('genderType')}" th:text="${type.description}"
+               class="form-check-label">
+            MALE
+        </label>
+    </div>
+</div>
+
+<form action="/" method="get">
+    <button type="submit">홈으로</button>
+</form>
+
 </body>
 </html>

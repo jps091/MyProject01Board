@@ -2,13 +2,36 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
 <div class="container">
-    <form action="/members/join" method="post">
+    <form th:action th:object="${member}" method="post">
         <div class="form-group">
             <label for="name">이름</label>
-            <input type="text" id="name" name="name" placeholder="이름을 입력하세요">
+            <input type="text" th:field="*{name}" th:placeholder="'이름을 입력하세요'">
             <label for="age">나이</label>
-            <input type="text" id="age" name="age" placeholder="나이를 입력하세요">
+            <input type="text" id="age" th:field="*{age}" th:placeholder="'나이를 입력하세요'">
         </div>
+
+        <!-- single checkbox -->
+        <div>정회원 승인</div>
+        <div>
+            <div class="form-check">
+                <input type="checkbox" id="open" name="open" th:field="*{open}" class="form-check-input">
+                <label for="open" class="form-check-label">승인</label>
+            </div>
+        </div>
+
+        <!-- radio button -->
+        <div>
+            <div>성별</div>
+            <div th:each="type : ${genderTypes}" class="form-check form-check-inline">
+                <input type="radio" th:field="*{genderType}" th:value="${type.name()}"
+                       class="form-check-input">
+                <label th:for="${#ids.prev('genderType')}" th:text="${type.description}"
+                       class="form-check-label">
+                    MALE
+                </label>
+            </div>
+        </div>
+
         <button type="submit">등록</button>
     </form>
 </div> <!-- /container -->

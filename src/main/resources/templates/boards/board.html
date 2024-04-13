@@ -10,6 +10,31 @@
     <li th:text="${resultBoard.memberId}"></li>
     <li th:text="${resultBoard.title}"></li>
     <li th:text="${resultBoard.content}"></li>
+
+    <!-- multi checkbox -->
+    <div>
+        <div>응답 받을 수단 선택</div>
+        <div th:each="responseMethod : ${responseMethods}" class="form-check form-check-inline">
+            <input type="checkbox" th:field="${resultBoard.responseMethods}" th:value="${responseMethod.key}"
+                   class="form-check-input" disabled>
+            <label th:for="${#ids.prev('responseMethods')}"
+                   th:text="${responseMethod.value}" class="form-check-label">문자</label>
+        </div>
+    </div>
+
+    <!-- SELECT -->
+    <div>
+        <div>문의글 유형</div>
+        <select th:field="${resultBoard.boardTypeCode}" class="form-select" disabled>
+            <option value="">==문의글 유형 선택==</option>
+            <option th:each="boardTypeCode : ${boardTypeCodes}" th:value="${boardTypeCode.code}"
+                    th:text="${boardTypeCode.displayName}">FAST</option>
+        </select>
+    </div>
+    <hr class="my-4">
 </ul>
+<form action="/" method="get">
+    <button type="submit">홈으로</button>
+</form>
 </body>
 </html>

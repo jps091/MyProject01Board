@@ -1,5 +1,6 @@
 package project01.board.board;
 
+import project01.board.controller.BoardForm;
 import project01.board.member.Member;
 import project01.board.repository.BoardRepository;
 import project01.board.repository.MemberRepository;
@@ -20,16 +21,17 @@ public class BoardServiceImpl implements  BoardService{
 
     @Override
 
-    public Board CreateBoard(Long memberId, String title, String contents) {
+    public Board CreateBoard(Long memberId, BoardForm form) {
         if(memberRepository.findById(memberId).isEmpty()){
             throw new BoardNotFoundException("멤버가 존재 하지 않습니다");
         }
 
         Board board = new Board();
         board.setMemberId(memberId);
-        board.setTitle(title);
-        board.setContent(contents);
-
+        board.setTitle(form.getTitle());
+        board.setContent(form.getContent());
+        board.setResponseMethods(form.getResponseMethods());
+        board.setBoardTypeCode(form.getBoardTypeCode());
         boardRepository.save(board);
         return  board;
     }

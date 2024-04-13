@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
 <div class="container">
-    <form action="/boards/create" method="post">
+    <form action="/boards/create" th:object="${board}" method="post">
         <div class="form-group">
             <label for="memberName">회원 이름</label>
             <input type="text" id="memberName" name="memberName" placeholder="회원 이름을 입력하세요">
@@ -11,6 +11,30 @@
             <label for="content">게시판 내용</label>
             <input type="text" id="content" name="content" placeholder="내용을 입력하세요">
         </div>
+
+        <!-- multi checkbox -->
+        <div>
+            <div>응답 받을 수단 선택</div>
+            <div th:each="responseMethod : ${responseMethods}" class="form-check form-check-inline">
+                <input type="checkbox" th:field="*{responseMethods}" th:value="${responseMethod.key}"
+                       class="form-check-input">
+                <label th:for="${#ids.prev('responseMethods')}"
+                       th:text="${responseMethod.value}" class="form-check-label">문자</label>
+            </div>
+        </div>
+
+        <!-- SELECT -->
+        <div>
+            <div>문의글 유형</div>
+            <select th:field="*{boardTypeCode}" class="form-select">
+                <option value="">==문의글 유형 선택==</option>
+                <option th:each="boardTypeCode : ${boardTypeCodes}" th:value="${boardTypeCode.code}"
+                        th:text="${boardTypeCode.displayName}">FAST</option>
+            </select>
+        </div>
+        <hr class="my-4">
+
+
         <button type="submit">작성</button>
     </form>
     <p th:if="${message != null}">

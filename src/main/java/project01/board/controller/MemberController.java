@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import project01.board.Utiliry.GenderType;
 import project01.board.member.Member;
 import project01.board.member.MemberNotFoundException;
 import project01.board.member.MemberService;
@@ -23,6 +24,11 @@ public class MemberController {
         this.memberService = memberService;
     }
 
+    @ModelAttribute("genderTypes")
+    public GenderType[] genderTypes(){
+        return GenderType.values();
+    }
+
     @GetMapping("/member/{memberId}")
     public String showMember(@PathVariable Long memberId, Model model){
         Member member = memberService.findMember(memberId);
@@ -31,18 +37,16 @@ public class MemberController {
     }
 
     @GetMapping("/join")
-    public String joinForm() {
+    public String joinForm(Model model) {
+        model.addAttribute("member", new Member());
         return "/members/joinForm";
     }
 
     @PostMapping("/join")
     public String joinMember(@ModelAttribute Member form) {
-        Member member = new Member();
-        member.setName(form.getName());
-        member.setAge(form.getAge());
-        memberService.join(member);
-        //return "redirect:/members/find/name?name="+member.getName();
-        return "redirect:/members/member/"+member.getMemberId();
+        log.info("Member.open={}",form.getOpen());
+        memberService.join(form);
+        return "redirect:/members/member/"+form.getMemberId();
     }
 
     @GetMapping
