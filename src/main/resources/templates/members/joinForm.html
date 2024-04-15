@@ -1,13 +1,31 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <style>
+        .container {
+            max-width: 560px;
+        }
+        .field-error {
+            border-color: #dc3545;
+            color: #dc3545;
+        }
+    </style>
+</head>
 <body>
 <div class="container">
     <form th:action th:object="${member}" method="post">
         <div class="form-group">
             <label for="name">이름</label>
-            <input type="text" th:field="*{name}" th:placeholder="'이름을 입력하세요'">
+            <input type="text" th:field="*{name}" th:errorclass="field-error" class="form-control" th:placeholder="'이름을 입력하세요'">
+            <div class="field-error" th:errors="*{name}">
+                이름 오류
+            </div>
             <label for="age">나이</label>
-            <input type="text" id="age" th:field="*{age}" th:placeholder="'나이를 입력하세요'">
+            <input type="text" id="age" th:field="*{age}" th:errorclass="field-error" class="form-control" th:placeholder="'나이를 입력하세요'">
+            <div class="field-error" th:errors="*{age}">
+                나이 오류
+            </div>
         </div>
 
         <!-- single checkbox -->

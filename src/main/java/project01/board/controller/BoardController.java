@@ -1,7 +1,11 @@
 package project01.board.controller;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import project01.board.Utiliry.BoardTypeCode;
@@ -10,23 +14,27 @@ import project01.board.board.BoardNotFoundException;
 import project01.board.board.BoardService;
 import project01.board.member.MemberNotFoundException;
 import project01.board.repository.MemberRepository;
+import project01.board.validation.BoardFormValidator;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
+@Slf4j
 @RequestMapping("/boards")
 @Controller
+@RequiredArgsConstructor
 public class BoardController {
 
     private final BoardService boardService;
     private final MemberRepository memberRepository;
+    private final BoardFormValidator boardFormValidator;
 
-    public BoardController(BoardService boardService, MemberRepository memberRepository) {
+
+/*    public BoardController(BoardService boardService, MemberRepository memberRepository) {
         this.boardService = boardService;
         this.memberRepository = memberRepository;
-    }
+    }*/
 
     @ModelAttribute("responseMethods")
     public Map<String,String> responseMethods(){
@@ -55,10 +63,10 @@ public class BoardController {
 
     @GetMapping("/create")
     public String createBoardForm(Model model){
-        model.addAttribute("board", new BoardForm());
+        model.addAttribute("boardForm", new BoardForm());
         return "/boards/createForm";
     }
-    @PostMapping("/create")
+    //@PostMapping("/create")
     public String createBoard(Model model, @ModelAttribute BoardForm boardForm, RedirectAttributes redirectAttributes){
         try{
             Long memberId = memberRepository.findByNameId(boardForm.getMemberName());
@@ -71,6 +79,67 @@ public class BoardController {
             return "/boards/createForm";
         }
     }
+
+    //@PostMapping("/create")
+    public String createBoardV1(@ModelAttribute BoardForm boardForm, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes){
+        try{
+            if(!StringUtils.hasText(boardForm.getMemberName())){
+                bindingResult.rejectValue("memberName", "required");
+            }
+            if(boardForm.getTitle() == null || boardForm.getTitle().length() < 2) {
+                bindingResult.rejectValue("title", "min", new Object[]{2}, null);
+                model.addAttribute("boardForm", boardForm);
+            }
+            if(boardForm.getContent() == null || boardForm.getContent().length() > 6){
+                bindingResult.rejectValue("content", "max", new Object[]{5}, null);
+            }
+
+            if(boardForm.getTitle() != null && boardForm.getContent() != null){
+                int totalLen = boardForm.getTitle().length() + boardForm.getContent().length();
+                if(totalLen > 10){
+                    bindingResult.reject("totalInputMax", new Object[]{10, totalLen}, null);
+                }
+            }
+            if(bindingResult.hasErrors()) {
+                log.info("errors={}", bindingResult);
+                model.addAttribute("boardForm", boardForm);
+                return "/boards/createForm";
+            }
+
+            // 성공 로직
+            Long memberId = memberRepository.findByNameId(boardForm.getMemberName());
+            Long boardId = boardService.CreateBoard(memberId, boardForm).getBoardId();
+            //model.addAttribute("boardForm", boardForm);
+            redirectAttributes.addAttribute("boardId", boardId);
+            return "redirect:/boards/board/{boardId}";
+        }catch (MemberNotFoundException e){
+            model.addAttribute("message", "존재하지 않는 회원 입니다.");
+            return "/boards/createForm";
+        }
+    }
+
+    @PostMapping("/create")
+    public String createBoardV2(@ModelAttribute BoardForm boardForm, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes){
+        try{
+            boardFormValidator.validate(boardForm, bindingResult);
+
+            if(bindingResult.hasErrors()) {
+                log.info("errors={}", bindingResult);
+                model.addAttribute("boardForm", boardForm);
+                return "/boards/createForm";
+            }
+
+            // 성공 로직
+            Long memberId = memberRepository.findByNameId(boardForm.getMemberName());
+            Long boardId = boardService.CreateBoard(memberId, boardForm).getBoardId();
+            redirectAttributes.addAttribute("boardId", boardId);
+            return "redirect:/boards/board/{boardId}";
+        }catch (MemberNotFoundException e){
+            model.addAttribute("message", "존재하지 않는 회원 입니다.");
+            return "/boards/createForm";
+        }
+    }
+
     @GetMapping
     public String findAllBoards(Model model){
         List<Board> boards = boardService.findAll();
