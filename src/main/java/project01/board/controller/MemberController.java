@@ -113,7 +113,7 @@ public class MemberController {
         }
 
 
-        // 성공 로직
+        // 성공 로직d
         log.info("Member.open={}",form.getOpen());
         memberService.join(form);
         redirectAttributes.addAttribute("memberId", form.getMemberId());

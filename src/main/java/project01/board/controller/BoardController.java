@@ -6,6 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import project01.board.Utiliry.BoardTypeCode;
@@ -118,7 +119,7 @@ public class BoardController {
         }
     }
 
-    @PostMapping("/create")
+    //@PostMapping("/create")
     public String createBoardV2(@ModelAttribute BoardForm boardForm, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes){
         try{
             boardFormValidator.validate(boardForm, bindingResult);
@@ -126,6 +127,27 @@ public class BoardController {
             if(bindingResult.hasErrors()) {
                 log.info("errors={}", bindingResult);
                 model.addAttribute("boardForm", boardForm);
+                return "/boards/createForm";
+            }
+
+            // 성공 로직
+            Long memberId = memberRepository.findByNameId(boardForm.getMemberName());
+            Long boardId = boardService.CreateBoard(memberId, boardForm).getBoardId();
+            redirectAttributes.addAttribute("boardId", boardId);
+            return "redirect:/boards/board/{boardId}";
+        }catch (MemberNotFoundException e){
+            model.addAttribute("message", "존재하지 않는 회원 입니다.");
+            return "/boards/createForm";
+        }
+    }
+
+    @PostMapping("/create")
+    public String createBoardV3(@Validated @ModelAttribute BoardForm boardForm, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes){
+        try{
+
+            if(bindingResult.hasErrors()) {
+                log.info("errors={}", bindingResult);
+                //model.addAttribute("boardForm", boardForm);
                 return "/boards/createForm";
             }
 
